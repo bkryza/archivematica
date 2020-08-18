@@ -16,13 +16,32 @@ RUN pip install -r /src/MCPClient/requirements/production.txt -r /src/MCPClient/
 COPY archivematicaCommon/ /src/archivematicaCommon/
 COPY dashboard/ /src/dashboard/
 COPY MCPClient/ /src/MCPClient/
+COPY entrypoint-client.sh /entrypoint-client.sh
 
 # Some scripts in archivematica-fpr-admin executed by MCPClient rely on certain
 # files being available in this image (e.g. see https://git.io/vA1wF).
 COPY archivematicaCommon/lib/externals/fido/ /usr/lib/archivematica/archivematicaCommon/externals/fido/
 COPY archivematicaCommon/lib/externals/fiwalk_plugins/ /usr/lib/archivematica/archivematicaCommon/externals/fiwalk_plugins/
 
+RUN apt update && apt-get -y install fuse sudo
+RUN pip install xattr
+RUN curl --output /tmp/oneclient_20.2.1.deb http://get.onedata.org/apt/ubuntu/2002/pool/main/o/oneclient/oneclient_20.02.1-1~bionic_amd64.deb && \
+    apt install /tmp/oneclient_20.2.1.deb && \
+    rm /tmp/oneclient_20.2.1.deb
+
+RUN adduser archivematica sudo
+RUN echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
+
+RUN oneclient -h
 
 USER archivematica
 
-ENTRYPOINT ["/src/MCPClient/lib/archivematicaClient.py"]
+ENV ONECLIENT_ACCESS_TOKEN=
+ENV ONECLIENT_PROVIDER_HOST=
+ENV ONECLIENT_SPACE=
+ENV ONECLIENT_OPTS=
+ENV ONECLIENT_MOUNTPOINT=/tmp/oneclient-mnt
+
+RUN mkdir /tmp/oneclient-mnt
+
+ENTRYPOINT ["bash", "/entrypoint-client.sh"]
