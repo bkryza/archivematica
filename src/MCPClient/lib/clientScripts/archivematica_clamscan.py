@@ -311,13 +311,19 @@ def scan_file(event_queue, file_uuid, path, date, task_uuid):
     scanner, passed = None, False
 
     try:
+        max_file_size = mcpclient_settings.CLAMAV_CLIENT_MAX_FILE_SIZE * 1024 * 1024
+        max_scan_size = mcpclient_settings.CLAMAV_CLIENT_MAX_SCAN_SIZE * 1024 * 1024
+
+        if max_file_size == 0 or max_scan_size == 0:
+            logger.info(
+                "Max file size is set to 0. Virus scanning will be skipped."
+            )
+            return 0
+
         size = get_size(file_uuid, path)
         if size is None:
             logger.error("Getting file size returned: %s", size)
             return 1
-
-        max_file_size = mcpclient_settings.CLAMAV_CLIENT_MAX_FILE_SIZE * 1024 * 1024
-        max_scan_size = mcpclient_settings.CLAMAV_CLIENT_MAX_SCAN_SIZE * 1024 * 1024
 
         valid_scan = True
 
