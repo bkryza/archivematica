@@ -45,9 +45,9 @@ RUN set -ex \
 
 RUN apt update && apt-get -y install fuse
 RUN pip install xattr
-RUN curl --output /tmp/oneclient_20.2.1.deb http://packages.devel.onedata.org/apt/ubuntu/2002/pool/main/o/oneclient/oneclient_20.02.0.beta4.100.g85db903-1~bionic_amd64.deb && \
-    apt install /tmp/oneclient_20.2.1.deb && \
-    rm /tmp/oneclient_20.2.1.deb
+RUN curl --output /tmp/oneclient_20.02.5.deb http://packages.onedata.org/apt/ubuntu/2002/pool/main/o/oneclient/oneclient_20.02.5-1~bionic_amd64.deb && \
+    apt install /tmp/oneclient_20.02.5.deb && \
+    rm /tmp/oneclient_20.02.5.deb
 
 RUN adduser archivematica sudo
 RUN echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
